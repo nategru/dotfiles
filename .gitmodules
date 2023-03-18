@@ -1,0 +1,3 @@
+[submodule "siriusxm"]
+	path = siriusxm
+	url = git@github.com:nategru/dotfiles-siriusxm.git
