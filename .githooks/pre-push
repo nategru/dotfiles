@@ -1,33 +1,13 @@
-#!/bin/bash
+#!/bin/sh
 
-# This hook is called with the following parameters:
-# $1 -- Name of the remote to which the push is being done
-# $2 -- URL to which the push is being done
-
-# Read from stdin to get the list of refs being pushed
+# Read the input from stdin, which provides information about the refs being pushed
 while read local_ref local_sha remote_ref remote_sha
 do
-    # Extract the branch name from the remote ref
-    if [[ $remote_ref =~ ^refs/heads/(.*)$ ]]; then
-        branch=${BASH_REMATCH[1]}
-        
-        # Check if we're trying to push to main or master
-        if [ "$branch" = "main" ] || [ "$branch" = "master" ]; then
-            echo "🚫 Push to $branch branch is not allowed!"
-            echo "This repository enforces a pull request workflow."
-            echo ""
-            echo "Please:"
-            echo "  1. Create a feature branch: git checkout -b feature/your-feature"
-            echo "  2. Push your feature branch: git push origin feature/your-feature"
-            echo "  3. Create a pull request to merge into $branch"
-            echo ""
-            echo "If you need to force push to $branch (admin only):"
-            echo "  git push --no-verify origin $branch"
-            echo ""
-            exit 1
-        fi
+    # Check if the remote branch being pushed to is 'main'
+    if [ "$remote_ref" = "refs/heads/main" ]; then
+        echo "Error: Direct pushes to the 'main' branch are not allowed. Please use a pull request." >&2
+        exit 1 # Abort the push
     fi
 done
 
-# Allow push if not targeting protected branches
-exit 0
+exit 0 # Allow the push if no issues are found
